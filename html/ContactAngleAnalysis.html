@@ -1,0 +1,851 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>ContactAngleAnalysis</title><meta name="generator" content="MATLAB 9.14"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2025-04-11"><meta name="DC.source" content="ContactAngleAnalysis.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; }
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+span.typesection { color:#A0522D }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><pre class="codeinput"><span class="keyword">function</span> ContactAngleAnalysis()
+    <span class="comment">% &#36873;&#25321;&#25991;&#20214;&#22841;</span>
+    folder = uigetdir(<span class="string">'&#36873;&#25321;&#21253;&#21547;TIFF&#22270;&#20687;&#30340;&#25991;&#20214;&#22841;'</span>);
+    <span class="keyword">if</span> folder == 0, <span class="keyword">return</span>; <span class="keyword">end</span>
+
+    <span class="comment">% &#33719;&#21462;&#25152;&#26377;TIFF&#25991;&#20214;</span>
+    files = dir(fullfile(folder, <span class="string">'*.jpg'</span>));
+    <span class="keyword">if</span> isempty(files)
+        errordlg(<span class="string">'&#26410;&#25214;&#21040;TIFF&#25991;&#20214;'</span>);
+        <span class="keyword">return</span>;
+    <span class="keyword">end</span>
+
+    <span class="comment">% &#21019;&#24314;&#32467;&#26524;&#20445;&#23384;&#36335;&#24452;</span>
+    result_dir = fullfile(folder, <span class="string">'results'</span>);
+    <span class="keyword">if</span> ~exist(result_dir, <span class="string">'dir'</span>)
+        mkdir(result_dir);
+    <span class="keyword">end</span>
+
+    <span class="comment">% &#22788;&#29702;&#27599;&#20010;&#22270;&#20687;</span>
+    <span class="keyword">for</span> i = 1:length(files)
+        processImage(fullfile(folder, files(i).name), result_dir);
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="keyword">function</span> processImage(imgPath, result_dir)
+    <span class="comment">% &#35835;&#21462;&#22270;&#20687;</span>
+    <span class="keyword">try</span>
+        I = imread(imgPath);
+    <span class="keyword">catch</span>
+        <span class="keyword">return</span>;
+    <span class="keyword">end</span>
+
+    <span class="comment">% &#36716;&#25442;&#20026;&#28784;&#24230;&#22270;&#20687;</span>
+    <span class="keyword">if</span> size(I,3) == 3
+        Igray = rgb2gray(I);
+    <span class="keyword">else</span>
+        Igray = I;
+    <span class="keyword">end</span>
+
+    <span class="comment">% &#20132;&#20114;&#24335;&#38408;&#20540;&#35774;&#32622;</span>
+    h = figure(<span class="string">'Name'</span>,<span class="string">'&#35774;&#32622;&#38408;&#20540;'</span>);
+    imshow(Igray);
+    title(<span class="string">'&#28784;&#24230;&#22270;&#20687; - &#35774;&#32622;&#38408;&#20540;&#21518;&#20851;&#38381;&#31383;&#21475;'</span>);
+
+    <span class="comment">% &#21019;&#24314;&#38408;&#20540;&#35843;&#33410;&#30028;&#38754;</span>
+    uicontrol(<span class="string">'Style'</span>,<span class="string">'slider'</span>,<span class="keyword">...</span>
+        <span class="string">'Position'</span>,[20 20 300 20],<span class="keyword">...</span>
+        <span class="string">'Min'</span>,0,<span class="string">'Max'</span>,1,<span class="string">'Value'</span>,0.5,<span class="keyword">...</span>
+        <span class="string">'Callback'</span>,@updateThreshold);
+
+    threshold = 0.6;
+    <span class="keyword">function</span> updateThreshold(src,~)
+        threshold = get(src,<span class="string">'Value'</span>);
+        BW = imbinarize(Igray, threshold);
+        subplot(1,1,1);
+        imshowpair(Igray, BW, <span class="string">'montage'</span>);
+        title([<span class="string">'&#24403;&#21069;&#38408;&#20540;: '</span> num2str(threshold,<span class="string">'%.2f'</span>)]);
+    <span class="keyword">end</span>
+
+    waitfor(h);
+
+    <span class="comment">% &#24212;&#29992;&#26368;&#32456;&#38408;&#20540;</span>
+    BW = imbinarize(Igray, threshold);
+    BW = imfill(BW, <span class="string">'holes'</span>);
+
+    <span class="comment">% &#24418;&#24577;&#23398;&#25805;&#20316;</span>
+    BW = imopen(BW, strel(<span class="string">'disk'</span>,3));
+
+    <span class="comment">% &#25214;&#21040;&#26368;&#22823;&#36830;&#36890;&#21306;&#22495;</span>
+    [BW_clean, boundary] = findLargestRegion(BW);
+
+    <span class="comment">% &#26816;&#27979;&#35282;&#28857;</span>
+    corners = detectCorners(boundary);
+
+    <span class="comment">% &#31579;&#36873;&#22235;&#20010;&#32437;&#22352;&#26631;&#26368;&#20302;&#30340;&#28857;&#65292;&#24182;&#36873;&#25321;&#20013;&#38388;&#30340;&#20004;&#20010;</span>
+    ellipsePoints = [];
+    <span class="keyword">if</span> size(corners, 1) &gt;= 4
+        [~, idx] = sort(corners(:, 2), <span class="string">'descend'</span>);
+        sorted_corners = corners(idx, :);
+        lowest_four = sorted_corners(1:4, :);
+
+        x_coords = lowest_four(:, 1);
+        median_x = median(x_coords);
+
+        distances = abs(x_coords - median_x);
+        [~, idx_sorted] = sort(distances);
+        selected_indices = idx_sorted(1:2);
+        central_two = lowest_four(selected_indices, :);
+
+        [~, x_order] = sort(central_two(:, 1));
+        central_two = central_two(x_order, :);
+
+        <span class="comment">% &#35745;&#31639;&#30452;&#32447;&#26041;&#31243;</span>
+        x1 = central_two(1, 1); y1 = central_two(1, 2);
+        x2 = central_two(2, 1); y2 = central_two(2, 2);
+
+        <span class="keyword">if</span> x2 ~= x1
+            m = (y2 - y1)/(x2 - x1);
+            b = y1 - m*x1;
+            line_eq = [m, b];
+        <span class="keyword">else</span>
+            m = Inf;
+            b = x1;
+            line_eq = [m, b];
+        <span class="keyword">end</span>
+
+        <span class="comment">% &#26925;&#22278;&#25311;&#21512;</span>
+        <span class="keyword">try</span>
+            <span class="comment">% &#26597;&#25214;&#36793;&#30028;&#28857;&#32034;&#24341;</span>
+            pt1 = [x1, y1]; pt2 = [x2, y2];
+            boundary_xy = fliplr(boundary); <span class="comment">% &#36716;&#25442;&#20026;[x,y]&#26684;&#24335;</span>
+
+            <span class="comment">% &#23547;&#25214;&#26368;&#36817;&#28857;&#32034;&#24341;</span>
+            [~, idx1] = min(sum((boundary_xy - pt1).^2, 2));
+            [~, idx2] = min(sum((boundary_xy - pt2).^2, 2));
+
+            <span class="comment">% &#25552;&#21462;&#20004;&#28857;&#38388;&#36739;&#30701;&#30340;&#36718;&#24275;&#27573;</span>
+            N = size(boundary_xy, 1);
+            <span class="keyword">if</span> abs(idx1 - idx2) &lt; N/2
+                contour_segment = boundary_xy(min(idx1,idx2):max(idx1,idx2), :);
+            <span class="keyword">else</span>
+                contour_segment = boundary_xy([max(idx1,idx2):end, 1:min(idx1,idx2)], :);
+            <span class="keyword">end</span>
+
+            <span class="comment">% &#26925;&#22278;&#25311;&#21512;</span>
+            <span class="keyword">if</span> size(contour_segment,1) &gt;= 5
+                ellipse = fitEllipse(contour_segment);
+
+                <span class="comment">% &#29983;&#25104;&#26925;&#22278;&#28857;</span>
+                theta = ellipse.theta;
+                h = ellipse.center(1); k = ellipse.center(2);
+                a = ellipse.major_axis; b = ellipse.minor_axis;
+
+                t = linspace(0, 2*pi, 100);
+                x_ellipse = h + a*cos(t)*cos(theta) - b*sin(t)*sin(theta);
+                y_ellipse = k + a*cos(t)*sin(theta) + b*sin(t)*cos(theta);
+                ellipsePoints = [x_ellipse', y_ellipse'];
+
+                <span class="comment">% &#35745;&#31639;R&sup2;&#20540;</span>
+                x_data = contour_segment(:,1);
+                y_data = contour_segment(:,2);
+
+                <span class="comment">% &#33719;&#21462;&#26925;&#22278;&#26041;&#31243;&#31995;&#25968;</span>
+                A = ellipse.A; B = ellipse.B; C = ellipse.C;
+                D = ellipse.D; E = ellipse.E; F = ellipse.F;
+
+                <span class="comment">% &#35745;&#31639;&#27531;&#24046;&#24179;&#26041;&#21644;</span>
+                residuals = A*x_data.^2 + B*x_data.*y_data + C*y_data.^2 + D*x_data + E*y_data + F;
+                SS_res = sum(residuals.^2);
+
+                <span class="comment">% &#35745;&#31639;&#24635;&#24179;&#26041;&#21644;&#65288;&#22522;&#20110;&#20013;&#24515;&#28857;&#65289;</span>
+                SS_tot = sum((x_data - h).^2 + (y_data - k).^2);
+
+                <span class="comment">% &#35745;&#31639;R&sup2;</span>
+                R_squared = 1 - (SS_res / SS_tot);
+
+                <span class="comment">% &#20445;&#23384;&#26925;&#22278;&#21442;&#25968;&#21644;R&sup2;</span>
+                [~, name] = fileparts(imgPath);
+                save_path = fullfile(result_dir, [name <span class="string">'_ellipse.txt'</span>]);
+                fid = fopen(save_path, <span class="string">'w'</span>);
+                fprintf(fid, <span class="string">'&#26925;&#22278;&#26631;&#20934;&#26041;&#31243;:\n'</span>);
+                fprintf(fid, <span class="string">'((x-%.4f)cos(%.4f) + (y-%.4f)sin(%.4f))^2/%.4f^2 + '</span>, h, theta, k, theta, a);
+                fprintf(fid, <span class="string">'((x-%.4f)sin(%.4f) - (y-%.4f)cos(%.4f))^2/%.4f^2 = 1\n'</span>, h, theta, k, theta, b);
+                fprintf(fid, <span class="string">'R&sup2;&#20540;: %.4f\n'</span>, R_squared);
+                fclose(fid);
+            <span class="keyword">else</span>
+                ellipsePoints = [];
+                R_squared = NaN;
+            <span class="keyword">end</span>
+        <span class="keyword">catch</span>
+            ellipsePoints = [];
+            R_squared = NaN;
+        <span class="keyword">end</span>
+    <span class="keyword">else</span>
+        central_two = [];
+        line_eq = [];
+        R_squared = NaN;
+    <span class="keyword">end</span>
+
+    <span class="comment">% &#35745;&#31639;&#25509;&#35302;&#35282;&#65288;&#26032;&#22686;&#37096;&#20998;&#65289;</span>
+    contact_angles = [];
+    <span class="keyword">if</span> ~isempty(central_two) &amp;&amp; ~isempty(ellipsePoints)
+        <span class="comment">% &#25552;&#21462;&#26925;&#22278;&#21442;&#25968;</span>
+        A = ellipse.A; B = ellipse.B; C = ellipse.C;
+        D = ellipse.D; E = ellipse.E;
+        <span class="comment">% &#22522;&#32447;&#21442;&#25968;</span>
+        m_line = line_eq(1);
+
+        <span class="comment">% &#36941;&#21382;&#27599;&#20010;&#25509;&#35302;&#28857;</span>
+        <span class="keyword">for</span> i = 1:size(central_two,1)
+            x0 = central_two(i,1);
+            y0 = central_two(i,2);
+
+            <span class="comment">% &#35745;&#31639;&#26925;&#22278;&#22312;&#35813;&#28857;&#30340;&#20999;&#32447;&#26012;&#29575;</span>
+            numerator = -(2*A*x0 + B*y0 + D);
+            denominator = B*x0 + 2*C*y0 + E;
+            <span class="keyword">if</span> denominator == 0
+                m_tan = Inf; <span class="comment">% &#22402;&#30452;&#20999;&#32447;</span>
+            <span class="keyword">else</span>
+                m_tan = numerator / denominator;
+            <span class="keyword">end</span>
+
+            <span class="comment">% &#35745;&#31639;&#19982;&#22522;&#32447;&#22841;&#35282;</span>
+            <span class="keyword">if</span> m_line == Inf || m_line == -Inf
+                <span class="comment">% &#22522;&#32447;&#22402;&#30452;</span>
+                angle_rad = abs(pi/2 - atan(m_tan));
+            <span class="keyword">elseif</span> abs(m_tan) &gt; 1e10
+                <span class="comment">% &#20999;&#32447;&#22402;&#30452;</span>
+                angle_rad = abs(pi/2 - atan(m_line));
+            <span class="keyword">else</span>
+                angle_rad = atan(abs((m_tan - m_line)/(1 + m_tan*m_line)));
+            <span class="keyword">end</span>
+            contact_angles = [contact_angles; rad2deg(angle_rad)];
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+
+    visualizeResults(I, Igray, BW_clean, boundary, imgPath, result_dir,<span class="keyword">...</span>
+        corners, central_two, line_eq, ellipsePoints, R_squared, contact_angles);
+<span class="keyword">end</span>
+
+
+<span class="keyword">function</span> visualizeResults(I, Igray, BW, boundary, imgPath, save_dir,<span class="keyword">...</span>
+        corners, selectedPoints, lineParams, ellipsePoints, R_squared, contact_angles)
+    fig = figure(<span class="string">'Visible'</span>, <span class="string">'off'</span>, <span class="string">'Position'</span>, [100 100 1400 800]);
+
+    <span class="comment">% &#33719;&#21462;&#22270;&#20687;&#23610;&#23544;</span>
+    img_height = size(BW, 1);
+    img_width = size(BW, 2);
+
+    <span class="comment">% &#23376;&#22270;1&#65306;&#21407;&#22987;&#22270;&#20687;</span>
+    subplot(1, 3, 1);
+    imshow(I);
+    title(<span class="string">'&#21407;&#22987;&#22270;&#20687;'</span>);
+
+    <span class="comment">% &#23376;&#22270;2&#65306;&#28784;&#24230;&#22270;&#20687;</span>
+    subplot(1, 3, 2);
+    imshow(Igray);
+    title(<span class="string">'&#28784;&#24230;&#22270;&#20687;'</span>);
+
+    <span class="comment">% &#23376;&#22270;3&#65306;&#32472;&#21046;&#25311;&#21512;&#26925;&#22278;&#21644;&#25509;&#35302;&#35282;</span>
+    subplot(1, 3, 3);
+    imshow(BW);
+    hold <span class="string">on</span>;
+
+    <span class="comment">% &#32472;&#21046;&#35282;&#28857;</span>
+    <span class="keyword">if</span> ~isempty(corners)
+        plot(corners(:, 1), corners(:, 2), <span class="string">'ro'</span>, <span class="string">'MarkerSize'</span>, 10);
+    <span class="keyword">end</span>
+
+    <span class="comment">% &#32472;&#21046;&#25311;&#21512;&#26925;&#22278;&#21644;R&sup2;&#20540;</span>
+    <span class="keyword">if</span> ~isempty(ellipsePoints)
+        plot(ellipsePoints(:,1), ellipsePoints(:,2), <span class="string">'m-'</span>, <span class="string">'LineWidth'</span>, 2);
+        <span class="comment">% &#22312;&#24038;&#19978;&#35282;&#26174;&#31034;R&sup2;&#20540;</span>
+        text(10, 20, sprintf(<span class="string">'R&sup2; = %.3f'</span>, R_squared),<span class="keyword">...</span>
+            <span class="string">'Color'</span>, <span class="string">'white'</span>, <span class="string">'BackgroundColor'</span>, <span class="string">'black'</span>,<span class="keyword">...</span>
+            <span class="string">'VerticalAlignment'</span>, <span class="string">'top'</span>, <span class="string">'FontSize'</span>, 10);
+    <span class="keyword">end</span>
+
+    <span class="comment">% &#32472;&#21046;&#36873;&#20013;&#28857;&#21644;&#22522;&#32447;</span>
+    <span class="keyword">if</span> ~isempty(selectedPoints)
+        plot(selectedPoints(:, 1), selectedPoints(:, 2), <span class="string">'g*'</span>, <span class="string">'MarkerSize'</span>, 12);
+        x_lim = xlim; y_lim = ylim;
+        <span class="keyword">if</span> lineParams(1) ~= Inf
+            x_fit = linspace(x_lim(1), x_lim(2), 100);
+            y_fit = lineParams(1)*x_fit + lineParams(2);
+        <span class="keyword">else</span>
+            y_fit = linspace(y_lim(1), y_lim(2), 100);
+            x_fit = lineParams(2)*ones(size(y_fit));
+        <span class="keyword">end</span>
+        plot(x_fit, y_fit, <span class="string">'c--'</span>, <span class="string">'LineWidth'</span>, 2);
+    <span class="keyword">end</span>
+
+    <span class="comment">% &#32472;&#21046;&#25311;&#21512;&#26925;&#22278;</span>
+    <span class="keyword">if</span> ~isempty(ellipsePoints)
+        plot(ellipsePoints(:,1), ellipsePoints(:,2), <span class="string">'m-'</span>, <span class="string">'LineWidth'</span>, 2);
+    <span class="keyword">end</span>
+    title(<span class="string">'&#20108;&#20540;&#21270;&#12289;&#35282;&#28857;&#21644;&#25311;&#21512;&#32467;&#26524;'</span>);
+
+    <span class="keyword">if</span> ~isempty(contact_angles)
+        <span class="comment">% &#20027;&#26631;&#27880;&#65306;&#24213;&#37096;&#20013;&#22830;</span>
+        text_str = sprintf(<span class="string">'&#25509;&#35302;&#35282;: %.1f&deg; | %.1f&deg;'</span>,<span class="keyword">...</span>
+            contact_angles(1), contact_angles(2));
+        text(img_width/2, img_height-30, text_str,<span class="keyword">...</span>
+            <span class="string">'Color'</span>, [1 1 0],<span class="keyword">...</span><span class="comment">       % &#40644;&#33394;&#25991;&#23383;</span>
+            <span class="string">'FontSize'</span>, 14,<span class="keyword">...</span>
+            <span class="string">'FontWeight'</span>, <span class="string">'bold'</span>,<span class="keyword">...</span>
+            <span class="string">'HorizontalAlignment'</span>, <span class="string">'center'</span>,<span class="keyword">...</span>
+            <span class="string">'VerticalAlignment'</span>, <span class="string">'bottom'</span>,<span class="keyword">...</span>
+            <span class="string">'BackgroundColor'</span>, [1 0 0],<span class="keyword">...</span><span class="comment"> % &#32418;&#33394;&#32972;&#26223;</span>
+            <span class="string">'Margin'</span>, 3);
+
+        <span class="comment">% &#20999;&#32447;&#26631;&#27880;&#65306;&#25509;&#35302;&#28857;&#26049;</span>
+        <span class="keyword">for</span> i = 1:length(contact_angles)
+            <span class="comment">% &#31661;&#22836;&#36215;&#28857;&#65288;&#25509;&#35302;&#28857;&#65289;</span>
+            x_point = selectedPoints(i, 1);
+            y_point = selectedPoints(i, 2);
+
+            <span class="comment">% &#32472;&#21046;&#25351;&#31034;&#31661;&#22836;</span>
+            annotation(<span class="string">'arrow'</span>,<span class="keyword">...</span>
+                [x_point/img_width, (x_point+50)/img_width],<span class="keyword">...</span><span class="comment"> % X&#26041;&#21521;&#20559;&#31227;</span>
+                [y_point/img_height, (y_point-80)/img_height],<span class="keyword">...</span><span class="comment"> % Y&#26041;&#21521;&#20559;&#31227;</span>
+                <span class="string">'Color'</span>, [0 1 0], <span class="string">'LineWidth'</span>, 1.5);
+
+            <span class="comment">% &#35282;&#24230;&#20540;&#26631;&#27880;</span>
+            text(x_point+20, y_point-60,<span class="keyword">...</span>
+                sprintf(<span class="string">'%.1f&deg;'</span>, contact_angles(i)),<span class="keyword">...</span>
+                <span class="string">'Color'</span>, [0 1 1],<span class="keyword">...</span><span class="comment">    % &#38738;&#33394;&#25991;&#23383;</span>
+                <span class="string">'FontSize'</span>, 12,<span class="keyword">...</span>
+                <span class="string">'FontWeight'</span>, <span class="string">'bold'</span>);
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+
+    <span class="comment">% &#20445;&#23384;&#32467;&#26524;&#65288;&#20445;&#25345;&#21407;&#26377;&#20195;&#30721;&#19981;&#21464;&#65289;</span>
+    [~, name] = fileparts(imgPath);
+    save_path = fullfile(save_dir, [name <span class="string">'_result.png'</span>]);
+    print(fig, save_path, <span class="string">'-dpng'</span>, <span class="string">'-r300'</span>);
+    close(fig);
+<span class="keyword">end</span>
+<span class="keyword">function</span> [BW_clean, boundary] = findLargestRegion(BW)
+    CC = bwconncomp(BW);
+    numPixels = cellfun(@numel, CC.PixelIdxList);
+    [~, idx] = max(numPixels);
+    BW_clean = false(size(BW));
+    BW_clean(CC.PixelIdxList{idx}) = true;
+    boundary = bwboundaries(BW_clean);
+    boundary = boundary{1};
+<span class="keyword">end</span>
+
+<span class="keyword">function</span> corners = detectCorners(boundary)
+    x = boundary(:,2); y = boundary(:,1);
+    points = [x, y];
+
+    min_pt = min(points); max_pt = max(points);
+    bbox_diag = norm(max_pt - min_pt);
+
+    dx = diff(x); dy = diff(y);
+    distances = sqrt(dx.^2 + dy.^2);
+    perimeter = sum(distances);
+
+    tol_ratio = 0.02;
+    tol_pixels = perimeter * tol_ratio;
+    tol = max(min(tol_pixels / bbox_diag, 1), 0.001);
+
+    simplified_points = reducepoly(points, tol);
+    [~, idx] = unique(simplified_points, <span class="string">'rows'</span>, <span class="string">'stable'</span>);
+    corners = simplified_points(sort(idx), :);
+<span class="keyword">end</span>
+
+<span class="keyword">function</span> ellipse = fitEllipse(points)
+    <span class="comment">% &#26925;&#22278;&#25311;&#21512;&#20989;&#25968;&#65288;&#22522;&#20110;&#30452;&#25509;&#26368;&#23567;&#20108;&#20056;&#27861;&#65289;</span>
+    x = points(:,1); y = points(:,2);
+
+    <span class="comment">% &#26500;&#24314;&#35774;&#35745;&#30697;&#38453;</span>
+    D = [x.^2, x.*y, y.^2, x, y, ones(size(x))];
+    S = D'*D;
+
+    <span class="comment">% &#26500;&#24314;&#32422;&#26463;&#30697;&#38453;</span>
+    C = zeros(6);
+    C(1,3) = 2; C(2,2) = -1; C(3,1) = 2;
+
+    <span class="comment">% &#27714;&#35299;&#24191;&#20041;&#29305;&#24449;&#20540;</span>
+    [V, ~] = eig(S, C);
+
+    <span class="comment">% &#36873;&#25321;&#27491;&#30830;&#29305;&#24449;&#21521;&#37327;</span>
+    cond = 4*V(1,:).*V(3,:) - V(2,:).^2;
+    idx = find(cond &gt; 0 &amp; ~isinf(cond));
+    <span class="keyword">if</span> isempty(idx), error(<span class="string">'&#26080;&#27861;&#25311;&#21512;&#26925;&#22278;'</span>); <span class="keyword">end</span>
+    params = V(:,idx(1));
+
+    <span class="comment">% &#35299;&#26512;&#26925;&#22278;&#21442;&#25968;</span>
+    A = params(1); B = params(2); C = params(3);
+    D = params(4); E = params(5); F = params(6);
+
+    <span class="comment">% &#35745;&#31639;&#20013;&#24515;&#22352;&#26631;</span>
+    denominator = B^2 - 4*A*C;
+    h = (2*C*D - B*E)/denominator;
+    k = (2*A*E - B*D)/denominator;
+
+    <span class="comment">% &#35745;&#31639;&#36724;&#38271;&#21644;&#35282;&#24230;</span>
+    term = sqrt((A - C)^2 + B^2);
+    a = sqrt(-(F - (A*h^2 + B*h*k + C*k^2))/((A + C + term)/2));
+    b = sqrt(-(F - (A*h^2 + B*h*k + C*k^2))/((A + C - term)/2));
+    theta = 0.5*atan2(B, A - C);
+
+    <span class="comment">% &#36820;&#22238;&#32467;&#26500;&#20307;&#65288;&#26032;&#22686;&#26041;&#31243;&#31995;&#25968;&#23384;&#20648;&#65289;</span>
+    ellipse = struct(<span class="string">'center'</span>, [h, k], <span class="string">'major_axis'</span>, a,<span class="keyword">...</span>
+        <span class="string">'minor_axis'</span>, b, <span class="string">'theta'</span>, theta,<span class="keyword">...</span>
+        <span class="string">'A'</span>, A, <span class="string">'B'</span>, B, <span class="string">'C'</span>, C, <span class="string">'D'</span>, D, <span class="string">'E'</span>, E, <span class="string">'F'</span>, F);
+<span class="keyword">end</span>
+</pre><p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2023a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+function ContactAngleAnalysis()
+    % 选择文件夹
+    folder = uigetdir('选择包含TIFF图像的文件夹');
+    if folder == 0, return; end
+    
+    % 获取所有TIFF文件
+    files = dir(fullfile(folder, '*.jpg'));
+    if isempty(files)
+        errordlg('未找到TIFF文件');
+        return;
+    end
+    
+    % 创建结果保存路径
+    result_dir = fullfile(folder, 'results');
+    if ~exist(result_dir, 'dir')
+        mkdir(result_dir);
+    end
+    
+    % 处理每个图像
+    for i = 1:length(files)
+        processImage(fullfile(folder, files(i).name), result_dir);
+    end
+end
+
+function processImage(imgPath, result_dir)
+    % 读取图像
+    try
+        I = imread(imgPath);
+    catch
+        return;
+    end
+    
+    % 转换为灰度图像
+    if size(I,3) == 3
+        Igray = rgb2gray(I);
+    else
+        Igray = I;
+    end
+    
+    % 交互式阈值设置
+    h = figure('Name','设置阈值');
+    imshow(Igray);
+    title('灰度图像 - 设置阈值后关闭窗口');
+    
+    % 创建阈值调节界面
+    uicontrol('Style','slider',...
+        'Position',[20 20 300 20],...
+        'Min',0,'Max',1,'Value',0.5,...
+        'Callback',@updateThreshold);
+    
+    threshold = 0.6;
+    function updateThreshold(src,~)
+        threshold = get(src,'Value');
+        BW = imbinarize(Igray, threshold);
+        subplot(1,1,1);
+        imshowpair(Igray, BW, 'montage');
+        title(['当前阈值: ' num2str(threshold,'%.2f')]);
+    end
+    
+    waitfor(h);
+    
+    % 应用最终阈值
+    BW = imbinarize(Igray, threshold);
+    BW = imfill(BW, 'holes');
+    
+    % 形态学操作
+    BW = imopen(BW, strel('disk',3));
+    
+    % 找到最大连通区域
+    [BW_clean, boundary] = findLargestRegion(BW);
+    
+    % 检测角点
+    corners = detectCorners(boundary);
+    
+    % 筛选四个纵坐标最低的点，并选择中间的两个
+    ellipsePoints = [];
+    if size(corners, 1) >= 4
+        [~, idx] = sort(corners(:, 2), 'descend');
+        sorted_corners = corners(idx, :);
+        lowest_four = sorted_corners(1:4, :);
+        
+        x_coords = lowest_four(:, 1);
+        median_x = median(x_coords);
+        
+        distances = abs(x_coords - median_x);
+        [~, idx_sorted] = sort(distances);
+        selected_indices = idx_sorted(1:2);
+        central_two = lowest_four(selected_indices, :);
+        
+        [~, x_order] = sort(central_two(:, 1));
+        central_two = central_two(x_order, :);
+        
+        % 计算直线方程
+        x1 = central_two(1, 1); y1 = central_two(1, 2);
+        x2 = central_two(2, 1); y2 = central_two(2, 2);
+        
+        if x2 ~= x1
+            m = (y2 - y1)/(x2 - x1);
+            b = y1 - m*x1;
+            line_eq = [m, b];
+        else
+            m = Inf;
+            b = x1;
+            line_eq = [m, b];
+        end
+            
+        % 椭圆拟合
+        try
+            % 查找边界点索引
+            pt1 = [x1, y1]; pt2 = [x2, y2];
+            boundary_xy = fliplr(boundary); % 转换为[x,y]格式
+            
+            % 寻找最近点索引
+            [~, idx1] = min(sum((boundary_xy - pt1).^2, 2));
+            [~, idx2] = min(sum((boundary_xy - pt2).^2, 2));
+            
+            % 提取两点间较短的轮廓段
+            N = size(boundary_xy, 1);
+            if abs(idx1 - idx2) < N/2
+                contour_segment = boundary_xy(min(idx1,idx2):max(idx1,idx2), :);
+            else
+                contour_segment = boundary_xy([max(idx1,idx2):end, 1:min(idx1,idx2)], :);
+            end
+            
+            % 椭圆拟合
+            if size(contour_segment,1) >= 5
+                ellipse = fitEllipse(contour_segment);
+                
+                % 生成椭圆点
+                theta = ellipse.theta;
+                h = ellipse.center(1); k = ellipse.center(2);
+                a = ellipse.major_axis; b = ellipse.minor_axis;
+                
+                t = linspace(0, 2*pi, 100);
+                x_ellipse = h + a*cos(t)*cos(theta) - b*sin(t)*sin(theta);
+                y_ellipse = k + a*cos(t)*sin(theta) + b*sin(t)*cos(theta);
+                ellipsePoints = [x_ellipse', y_ellipse'];
+                
+                % 计算R²值
+                x_data = contour_segment(:,1);
+                y_data = contour_segment(:,2);
+                
+                % 获取椭圆方程系数
+                A = ellipse.A; B = ellipse.B; C = ellipse.C;
+                D = ellipse.D; E = ellipse.E; F = ellipse.F;
+                
+                % 计算残差平方和
+                residuals = A*x_data.^2 + B*x_data.*y_data + C*y_data.^2 + D*x_data + E*y_data + F;
+                SS_res = sum(residuals.^2);
+                
+                % 计算总平方和（基于中心点）
+                SS_tot = sum((x_data - h).^2 + (y_data - k).^2);
+                
+                % 计算R²
+                R_squared = 1 - (SS_res / SS_tot);
+                
+                % 保存椭圆参数和R²
+                [~, name] = fileparts(imgPath);
+                save_path = fullfile(result_dir, [name '_ellipse.txt']);
+                fid = fopen(save_path, 'w');
+                fprintf(fid, '椭圆标准方程:\n');
+                fprintf(fid, '((x-%.4f)cos(%.4f) + (y-%.4f)sin(%.4f))^2/%.4f^2 + ', h, theta, k, theta, a);
+                fprintf(fid, '((x-%.4f)sin(%.4f) - (y-%.4f)cos(%.4f))^2/%.4f^2 = 1\n', h, theta, k, theta, b);
+                fprintf(fid, 'R²值: %.4f\n', R_squared);
+                fclose(fid);
+            else
+                ellipsePoints = [];
+                R_squared = NaN;
+            end
+        catch
+            ellipsePoints = [];
+            R_squared = NaN;
+        end
+    else
+        central_two = [];
+        line_eq = [];
+        R_squared = NaN;
+    end
+
+    % 计算接触角（新增部分）
+    contact_angles = [];
+    if ~isempty(central_two) && ~isempty(ellipsePoints)
+        % 提取椭圆参数
+        A = ellipse.A; B = ellipse.B; C = ellipse.C;
+        D = ellipse.D; E = ellipse.E; 
+        % 基线参数
+        m_line = line_eq(1); 
+        
+        % 遍历每个接触点
+        for i = 1:size(central_two,1)
+            x0 = central_two(i,1);
+            y0 = central_two(i,2);
+            
+            % 计算椭圆在该点的切线斜率
+            numerator = -(2*A*x0 + B*y0 + D);
+            denominator = B*x0 + 2*C*y0 + E;
+            if denominator == 0
+                m_tan = Inf; % 垂直切线
+            else
+                m_tan = numerator / denominator;
+            end
+            
+            % 计算与基线夹角
+            if m_line == Inf || m_line == -Inf
+                % 基线垂直
+                angle_rad = abs(pi/2 - atan(m_tan));
+            elseif abs(m_tan) > 1e10
+                % 切线垂直
+                angle_rad = abs(pi/2 - atan(m_line));
+            else
+                angle_rad = atan(abs((m_tan - m_line)/(1 + m_tan*m_line)));
+            end
+            contact_angles = [contact_angles; rad2deg(angle_rad)];
+        end
+    end
+
+    visualizeResults(I, Igray, BW_clean, boundary, imgPath, result_dir,...
+        corners, central_two, line_eq, ellipsePoints, R_squared, contact_angles);
+end
+
+
+function visualizeResults(I, Igray, BW, boundary, imgPath, save_dir,...
+        corners, selectedPoints, lineParams, ellipsePoints, R_squared, contact_angles)
+    fig = figure('Visible', 'off', 'Position', [100 100 1400 800]);
+    
+    % 获取图像尺寸
+    img_height = size(BW, 1);
+    img_width = size(BW, 2);
+    
+    % 子图1：原始图像
+    subplot(1, 3, 1);
+    imshow(I);
+    title('原始图像');
+    
+    % 子图2：灰度图像
+    subplot(1, 3, 2);
+    imshow(Igray);
+    title('灰度图像');
+    
+    % 子图3：绘制拟合椭圆和接触角
+    subplot(1, 3, 3);
+    imshow(BW);
+    hold on;
+
+    % 绘制角点
+    if ~isempty(corners)
+        plot(corners(:, 1), corners(:, 2), 'ro', 'MarkerSize', 10);
+    end
+    
+    % 绘制拟合椭圆和R²值
+    if ~isempty(ellipsePoints)
+        plot(ellipsePoints(:,1), ellipsePoints(:,2), 'm-', 'LineWidth', 2);
+        % 在左上角显示R²值
+        text(10, 20, sprintf('R² = %.3f', R_squared),...
+            'Color', 'white', 'BackgroundColor', 'black',...
+            'VerticalAlignment', 'top', 'FontSize', 10);
+    end
+
+    % 绘制选中点和基线
+    if ~isempty(selectedPoints)
+        plot(selectedPoints(:, 1), selectedPoints(:, 2), 'g*', 'MarkerSize', 12);
+        x_lim = xlim; y_lim = ylim;
+        if lineParams(1) ~= Inf
+            x_fit = linspace(x_lim(1), x_lim(2), 100);
+            y_fit = lineParams(1)*x_fit + lineParams(2);
+        else
+            y_fit = linspace(y_lim(1), y_lim(2), 100);
+            x_fit = lineParams(2)*ones(size(y_fit));
+        end
+        plot(x_fit, y_fit, 'cREPLACE_WITH_DASH_DASH', 'LineWidth', 2);
+    end
+    
+    % 绘制拟合椭圆
+    if ~isempty(ellipsePoints)
+        plot(ellipsePoints(:,1), ellipsePoints(:,2), 'm-', 'LineWidth', 2);
+    end
+    title('二值化、角点和拟合结果');
+
+    if ~isempty(contact_angles)
+        % 主标注：底部中央
+        text_str = sprintf('接触角: %.1f° | %.1f°',...
+            contact_angles(1), contact_angles(2));
+        text(img_width/2, img_height-30, text_str,...
+            'Color', [1 1 0],...       % 黄色文字
+            'FontSize', 14,...
+            'FontWeight', 'bold',...
+            'HorizontalAlignment', 'center',...
+            'VerticalAlignment', 'bottom',...
+            'BackgroundColor', [1 0 0],... % 红色背景
+            'Margin', 3);
+        
+        % 切线标注：接触点旁
+        for i = 1:length(contact_angles)
+            % 箭头起点（接触点）
+            x_point = selectedPoints(i, 1);
+            y_point = selectedPoints(i, 2);
+            
+            % 绘制指示箭头
+            annotation('arrow',...
+                [x_point/img_width, (x_point+50)/img_width],... % X方向偏移
+                [y_point/img_height, (y_point-80)/img_height],... % Y方向偏移
+                'Color', [0 1 0], 'LineWidth', 1.5);
+            
+            % 角度值标注
+            text(x_point+20, y_point-60,...
+                sprintf('%.1f°', contact_angles(i)),...
+                'Color', [0 1 1],...    % 青色文字
+                'FontSize', 12,...
+                'FontWeight', 'bold');
+        end
+    end
+    
+    % 保存结果（保持原有代码不变）
+    [~, name] = fileparts(imgPath);
+    save_path = fullfile(save_dir, [name '_result.png']);
+    print(fig, save_path, '-dpng', '-r300');
+    close(fig);
+end
+function [BW_clean, boundary] = findLargestRegion(BW)
+    CC = bwconncomp(BW);
+    numPixels = cellfun(@numel, CC.PixelIdxList);
+    [~, idx] = max(numPixels);
+    BW_clean = false(size(BW));
+    BW_clean(CC.PixelIdxList{idx}) = true;
+    boundary = bwboundaries(BW_clean);
+    boundary = boundary{1};
+end
+
+function corners = detectCorners(boundary)
+    x = boundary(:,2); y = boundary(:,1);
+    points = [x, y];
+    
+    min_pt = min(points); max_pt = max(points);
+    bbox_diag = norm(max_pt - min_pt);
+    
+    dx = diff(x); dy = diff(y);
+    distances = sqrt(dx.^2 + dy.^2);
+    perimeter = sum(distances);
+    
+    tol_ratio = 0.02;
+    tol_pixels = perimeter * tol_ratio;
+    tol = max(min(tol_pixels / bbox_diag, 1), 0.001);
+    
+    simplified_points = reducepoly(points, tol);
+    [~, idx] = unique(simplified_points, 'rows', 'stable');
+    corners = simplified_points(sort(idx), :);
+end
+
+function ellipse = fitEllipse(points)
+    % 椭圆拟合函数（基于直接最小二乘法）
+    x = points(:,1); y = points(:,2);
+    
+    % 构建设计矩阵
+    D = [x.^2, x.*y, y.^2, x, y, ones(size(x))];
+    S = D'*D;
+    
+    % 构建约束矩阵
+    C = zeros(6);
+    C(1,3) = 2; C(2,2) = -1; C(3,1) = 2;
+    
+    % 求解广义特征值
+    [V, ~] = eig(S, C);
+    
+    % 选择正确特征向量
+    cond = 4*V(1,:).*V(3,:) - V(2,:).^2;
+    idx = find(cond > 0 & ~isinf(cond));
+    if isempty(idx), error('无法拟合椭圆'); end
+    params = V(:,idx(1));
+    
+    % 解析椭圆参数
+    A = params(1); B = params(2); C = params(3);
+    D = params(4); E = params(5); F = params(6);
+    
+    % 计算中心坐标
+    denominator = B^2 - 4*A*C;
+    h = (2*C*D - B*E)/denominator;
+    k = (2*A*E - B*D)/denominator;
+    
+    % 计算轴长和角度
+    term = sqrt((A - C)^2 + B^2);
+    a = sqrt(-(F - (A*h^2 + B*h*k + C*k^2))/((A + C + term)/2));
+    b = sqrt(-(F - (A*h^2 + B*h*k + C*k^2))/((A + C - term)/2));
+    theta = 0.5*atan2(B, A - C);
+    
+    % 返回结构体（新增方程系数存储）
+    ellipse = struct('center', [h, k], 'major_axis', a,...
+        'minor_axis', b, 'theta', theta,...
+        'A', A, 'B', B, 'C', C, 'D', D, 'E', E, 'F', F);
+end
+##### SOURCE END #####
+--></body></html>
