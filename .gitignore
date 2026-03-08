@@ -1,0 +1,27 @@
+# MATLAB temporary and autosave files
+*.asv
+*.autosave
+*.m~
+
+# MATLAB editor/project metadata
+*.mlx~
+
+# Runtime output folders
+results/
+**/results/
+
+# MATLAB Compiler generated artifacts
+ContactAngleAnalysis/PackagingLog.html
+ContactAngleAnalysis/for_redistribution/
+ContactAngleAnalysis/for_redistribution_files_only/
+ContactAngleAnalysis/for_testing/
+
+# Executables and packaged binaries
+*.exe
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
